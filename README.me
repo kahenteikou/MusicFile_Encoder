@@ -1,0 +1,11 @@
+[音声のみ]
+youtube-dl [URL]-x --audio-format [拡張子]
+
+[動画]
+youtube-dl -f 137+251 --merge-output-format mp4 [URL]
+
+[情報確認]
+youtube-dl URL  -F     利用可能なダウンロード設定を表示
+
+[.wavを .mp3 変換]
+ffmpeg -i [URL] -vn -ac 2 -ar 44100 -ab 320.2k -acodec libmp3lame -f wav [.wav]
