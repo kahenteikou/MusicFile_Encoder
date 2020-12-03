@@ -1,0 +1,7 @@
+C:\Users\yw325\Desktop\MusicFile_Encoder\MusicFile_Encoder\obj\Debug\MusicFile_Encoder.csprojAssemblyReference.cache
+C:\Users\yw325\Desktop\MusicFile_Encoder\MusicFile_Encoder\obj\Debug\MusicFile_Encoder.csproj.CoreCompileInputs.cache
+C:\Users\yw325\Desktop\MusicFile_Encoder\MusicFile_Encoder\bin\Debug\MusicFile_Encoder.exe.config
+C:\Users\yw325\Desktop\MusicFile_Encoder\MusicFile_Encoder\bin\Debug\MusicFile_Encoder.exe
+C:\Users\yw325\Desktop\MusicFile_Encoder\MusicFile_Encoder\bin\Debug\MusicFile_Encoder.pdb
+C:\Users\yw325\Desktop\MusicFile_Encoder\MusicFile_Encoder\obj\Debug\MusicFile_Encoder.exe
+C:\Users\yw325\Desktop\MusicFile_Encoder\MusicFile_Encoder\obj\Debug\MusicFile_Encoder.pdb
