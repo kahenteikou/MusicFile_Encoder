@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,23 +13,32 @@ namespace MusicFile_Encoder
     {
         public Encorder()
         {
-            System.Console.WriteLine("コンストラクタ\n");
-
-
+            //System.Console.WriteLine("コンストラクタ\n");
         }
 
         // メイン
         public void Update()
         {
+            
+            
+
+
+
+
+            /*
             var app = new ProcessStartInfo();
             //app.UseShellExecute = true;
 
 
 
             Console.Write("FilePath >  ");
-            string name = Console.ReadLine();
-            string output = "C:\\Users\\yw325\\Desktop\\MusicFile_Encoder\\MusicFile_Encoder\\bin\\Debug";
-            string tmp =  " -i " + name + " -vn -ac 2 -ar 44100 -ab 320k - acodec libmp3lame -f wav " + output + "test.wav";
+            string FilePath = Console.ReadLine();
+
+
+
+
+            string outputPath = "C:\\Users\\yw325\\Desktop\\MusicFile_Encoder\\MusicFile_Encoder\\";
+            string tmp =  " -i " + FilePath + " -vn -ac 2 -ar 44100 -ab 320k -acodec libmp3lame -f wav " + outputPath + "test.wav";
             Console.WriteLine(tmp);
             app.FileName = "ffmpeg.exe";
             app.Arguments = tmp;
@@ -36,6 +46,7 @@ namespace MusicFile_Encoder
 
             Process.Start(app);
             Console.ReadKey();
+            */
         }
     }
 
