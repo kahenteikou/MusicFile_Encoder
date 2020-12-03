@@ -19,12 +19,35 @@ namespace MusicFile_Encoder
         // メイン
         public void Update()
         {
-            
-            
+
+
+            Console.Write("FilePath >  ");
+            string FilePath = Console.ReadLine();
+
+
+
+            foreach (string d in Directory.GetDirectories(FilePath))
+            {
+                foreach (string f in Directory.GetFiles(d))
+                {
+                    Console.WriteLine("あああ" + f);
+                }
+
+            }
+
+            /*
+            IEnumerable<string> files = System.IO.Directory.EnumerateFileSystemEntries(FilePath);
+
+            //ファイルを列挙する
+            foreach (string f in files)
+            {
+                Console.WriteLine(f);
+            }*/
 
 
 
 
+            Console.ReadKey();
             /*
             var app = new ProcessStartInfo();
             //app.UseShellExecute = true;
@@ -48,6 +71,7 @@ namespace MusicFile_Encoder
             Console.ReadKey();
             */
         }
+
     }
 
     class Program
