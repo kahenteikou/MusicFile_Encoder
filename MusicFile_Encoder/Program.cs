@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Diagnostics;
-
+using System.Threading;
 
 namespace MusicFile_Encoder
 {
@@ -17,8 +17,6 @@ namespace MusicFile_Encoder
 
           //  Console.WriteLine(s);
         }
-
-
 
 
 
@@ -103,7 +101,7 @@ namespace MusicFile_Encoder
         {
     
             //　ファイルパス読み込み
-            string name = "C:\\Users\\yw325\\Desktop\\Music";
+            string name = "C:\\src";
 
 
             // ファイルパス読み込み
@@ -141,12 +139,40 @@ namespace MusicFile_Encoder
             // アルバムクラスに設定
             Album enc = new Album(new List<string>(index[0]));
             Console.WriteLine(enc.getList_Count);
+            
+                
 
+            string dest_path=@"C:\dest";
 
+            foreach(string fpath in str)
+            {
+                string[] arkun = { fpath, fpath.Replace(name, dest_path) };
 
-
-
+                ThreadPool.QueueUserWorkItem(new WaitCallback(Run_Encode), arkun);
+            }
             Console.ReadKey();
+        }
+        private static void Run_Encode(object state)
+        {
+            object[] array = state as object[];
+            string fname = (String)(array[0]);
+            string out_name = (String)(array[1]);
+            Process proc = new Process();
+            proc.StartInfo.FileName = "ffmpeg.exe";
+            proc.StartInfo.Arguments = "-i \"" + fname + "\" \"" + out_name + ".mp3\"";
+            proc.StartInfo.UseShellExecute = false;
+            proc.StartInfo.CreateNoWindow = true;
+            proc.Start();
+            proc.WaitForExit();
+            if (proc.ExitCode != 0)
+            {
+                Console.Error.WriteLine("Err " + fname);
+
+            }
+            else
+            {
+                Console.WriteLine("Success " + fname);
+            }
         }
 
     }
