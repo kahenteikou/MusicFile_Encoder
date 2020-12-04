@@ -34,7 +34,7 @@ namespace MusicFile_Encoder
 
                 Title = tt;
       //          Console.WriteLine(Title);
-                Music_List = new List<string>(st);
+                Music_List =st;
             }
 
             private string Title;             //アルバム名
@@ -119,23 +119,23 @@ namespace MusicFile_Encoder
             List<string> tmp = new List<string>();
             foreach (string st in str)
             {
-               string s = st;
+               string s = System.IO.Path.GetFileName(Path.GetDirectoryName(st));
                 if (t != s)
                 {
                     if( b == true) // ループの最初は行わない
                     {
-                        index.Add(new List<string>(tmp));
-                        tmp.Clear();
+                        index.Add(tmp);
+                        tmp = new List<string>();
                     }
                     t = s;
-                    tmp.Add(s);
+                    tmp.Add(st);
 
                 }else{
-                    tmp.Add(s);
+                    tmp.Add(st);
                 }
                 b = true;
             }
-            index.Add(new List<string>(tmp));
+            index.Add(tmp);
             // ------------------------------------ 
 
             // アルバムクラスに設定
