@@ -11,13 +11,70 @@ namespace MusicFile_Encoder
 {
     class Encorder
     {
+
+        void test(int start,int length)
+        {
+
+          //  Console.WriteLine(s);
+        }
+
+
+
+
+
+        //アルバム管理クラス
+        class Album
+        {
+            //コンストラクタ
+            public Album(List<string> st)
+            {
+                //フォルダ名を取得  
+                string ss = System.IO.Path.GetDirectoryName(st[0]);
+                string tt = Path.GetFileNameWithoutExtension(ss);
+
+                Title = tt;
+      //          Console.WriteLine(Title);
+                Music_List = new List<string>(st);
+            }
+
+            private string Title;             //アルバム名
+            private List<string> Music_List;  // 曲名リスト
+
+            //タイトルを参照
+            public string getTitle
+            {
+                get{
+                    return Title;
+                }
+            }
+
+            //曲リストを参照
+            public List<string> getList
+            {
+                get{
+                    return Music_List;
+                }
+            }
+
+
+            //曲リストの数を参照
+            public int getList_Count
+            {
+                get
+                {
+                    return Music_List.Count();
+                }
+            }
+
+        }
+
         public Encorder()
         {
             //System.Console.WriteLine("コンストラクタ\n");
         }
 
 
-
+        // ディレクトリを再帰的に走査
         public static void Tree_Recursive(string folderPath, ref List<string> list)
         {
             foreach (String fname in Directory.EnumerateFiles(folderPath))
@@ -44,52 +101,30 @@ namespace MusicFile_Encoder
         // メイン
         public void Update()
         {
+    
             //　ファイルパス読み込み
-            //Console.Write("File Path > ");
-            string name = "C:\\Users\\yw325\\Desktop\\Music";   
-            //string name = Console.ReadLine();
+            string name = "C:\\Users\\yw325\\Desktop\\Music";
+
+
+            // ファイルパス読み込み
             List<string> str = new List<string>();
+            Tree_Recursive(name,ref str);           //ディレクトリを再帰的に走査
 
-            Tree_Recursive(name,ref str);   //ファイルパス読み込み
+            List<Album> Enc_List = new List<Album>();               //エンコード リスト
+            List<List<string>> index = new List<List<string>>();    //アルバムことに分解    
 
-            List<List<string>> index = new List<List<string>>();
-            
+            // ------------------------------------ アルバムごとに分解
             bool b = false;
             string t = "";
-
             List<string> tmp = new List<string>();
-
-            foreach(string a in str)
+            foreach (string st in str)
             {
-        //        Console.WriteLine(a);
-            }
-
-            Console.WriteLine();
-            Console.WriteLine();
-            Console.WriteLine();
-            Console.WriteLine();
-            Console.WriteLine();
-            Console.WriteLine();
-            Console.WriteLine();
-            Console.WriteLine();
-
-            foreach(string st in str)
-            {
-                string s = System.IO.Path.GetDirectoryName(st);
-            //    Console.WriteLine(s);
-                if(t != s)
+               string s = st;
+                if (t != s)
                 {
                     if( b == true) // ループの最初は行わない
                     {
-                        index.Add(tmp);
-                        
-                        //確認コード
-                        foreach(var r in tmp)
-                        {
-        //                    Console.WriteLine(r);
-                         }
-
-          //              Console.WriteLine("\n\n\n");
+                        index.Add(new List<string>(tmp));
                         tmp.Clear();
                     }
                     t = s;
@@ -98,19 +133,14 @@ namespace MusicFile_Encoder
                 }else{
                     tmp.Add(s);
                 }
-
-
                 b = true;
-            
             }
-            index.Add(tmp);
+            index.Add(new List<string>(tmp));
+            // ------------------------------------ 
 
-            foreach(string a in tmp)
-            {
-            //    Console.WriteLine(a);
-            }
-
-            Console.WriteLine("index: " + index[0].Count());    //いくつ入っているか？
+            // アルバムクラスに設定
+            Album enc = new Album(new List<string>(index[0]));
+            Console.WriteLine(enc.getList_Count);
 
 
 
