@@ -16,60 +16,107 @@ namespace MusicFile_Encoder
             //System.Console.WriteLine("コンストラクタ\n");
         }
 
+
+
+        public static void Tree_Recursive(string folderPath, ref List<string> list)
+        {
+            foreach (String fname in Directory.EnumerateFiles(folderPath))
+            {
+                list.Add(fname);
+            }
+            IEnumerable<String> folders = Directory.EnumerateDirectories(folderPath);
+            if (folders.Count() == 0)
+            {
+                return;
+            }
+            else
+            {
+                foreach (String dname in folders)
+                {
+                    Tree_Recursive(dname, ref list);
+                }
+            }
+        }
+
+
+
+
         // メイン
         public void Update()
         {
+            //　ファイルパス読み込み
+            //Console.Write("File Path > ");
+            string name = "C:\\Users\\yw325\\Desktop\\Music";   
+            //string name = Console.ReadLine();
+            List<string> str = new List<string>();
 
+            Tree_Recursive(name,ref str);   //ファイルパス読み込み
 
-            Console.Write("FilePath >  ");
-            string FilePath = Console.ReadLine();
+            List<List<string>> index = new List<List<string>>();
+            
+            bool b = false;
+            string t = "";
 
+            List<string> tmp = new List<string>();
 
-
-            foreach (string d in Directory.GetDirectories(FilePath))
+            foreach(string a in str)
             {
-                foreach (string f in Directory.GetFiles(d))
-                {
-                    Console.WriteLine("あああ" + f);
-                }
-
+        //        Console.WriteLine(a);
             }
 
-            /*
-            IEnumerable<string> files = System.IO.Directory.EnumerateFileSystemEntries(FilePath);
+            Console.WriteLine();
+            Console.WriteLine();
+            Console.WriteLine();
+            Console.WriteLine();
+            Console.WriteLine();
+            Console.WriteLine();
+            Console.WriteLine();
+            Console.WriteLine();
 
-            //ファイルを列挙する
-            foreach (string f in files)
+            foreach(string st in str)
             {
-                Console.WriteLine(f);
-            }*/
+                string s = System.IO.Path.GetDirectoryName(st);
+            //    Console.WriteLine(s);
+                if(t != s)
+                {
+                    if( b == true) // ループの最初は行わない
+                    {
+                        index.Add(tmp);
+                        
+                        //確認コード
+                        foreach(var r in tmp)
+                        {
+        //                    Console.WriteLine(r);
+                         }
+
+          //              Console.WriteLine("\n\n\n");
+                        tmp.Clear();
+                    }
+                    t = s;
+                    tmp.Add(s);
+
+                }else{
+                    tmp.Add(s);
+                }
+
+
+                b = true;
+            
+            }
+            index.Add(tmp);
+
+            foreach(string a in tmp)
+            {
+            //    Console.WriteLine(a);
+            }
+
+            Console.WriteLine("index: " + index[0].Count());    //いくつ入っているか？
+
 
 
 
 
             Console.ReadKey();
-            /*
-            var app = new ProcessStartInfo();
-            //app.UseShellExecute = true;
-
-
-
-            Console.Write("FilePath >  ");
-            string FilePath = Console.ReadLine();
-
-
-
-
-            string outputPath = "C:\\Users\\yw325\\Desktop\\MusicFile_Encoder\\MusicFile_Encoder\\";
-            string tmp =  " -i " + FilePath + " -vn -ac 2 -ar 44100 -ab 320k -acodec libmp3lame -f wav " + outputPath + "test.wav";
-            Console.WriteLine(tmp);
-            app.FileName = "ffmpeg.exe";
-            app.Arguments = tmp;
-            app.CreateNoWindow = true;
-
-            Process.Start(app);
-            Console.ReadKey();
-            */
         }
 
     }
