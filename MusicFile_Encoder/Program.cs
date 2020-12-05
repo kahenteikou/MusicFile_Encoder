@@ -201,7 +201,7 @@ namespace MusicFile_Encoder
             Console.WriteLine("うう" + fname);
 
             //エンコードファイル(フルパス), 出力ファイル名 
-            proc.StartInfo.Arguments = " -y -i " + dc + fname + dc + option + dc + TitleName + dc;
+            proc.StartInfo.Arguments = " -y -i " + dc + fname + dc + option + dc + DirName + "\\" + TitleName + dc;
 
             
             
