@@ -4,6 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+
+/*
+ * 色をつけた文字表示をする。
+ */
+
 class Color_Print
 {
     private enum ConsoleColor
@@ -32,7 +37,7 @@ class Color_Print
     }
 
 
-    ConsoleColor Color; //色
+  
 
 
 
