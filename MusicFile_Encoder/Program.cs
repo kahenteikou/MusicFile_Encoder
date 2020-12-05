@@ -70,14 +70,16 @@ namespace MusicFile_Encoder
             //System.Console.WriteLine("コンストラクタ\n");
         }
 
+
         // ディレクトリを再帰的に走査
         public static void Tree_Recursive(string folderPath, ref List<string> list)
         {
-            foreach (String fname in Directory.EnumerateFiles(folderPath))
+            foreach (String fname in Directory.EnumerateFiles(folderPath))//ファイルを列挙する
             {
                 list.Add(fname);
             }
-            IEnumerable<String> folders = Directory.EnumerateDirectories(folderPath);
+
+            IEnumerable<String> folders = Directory.EnumerateDirectories(folderPath);//ディレクトリを列挙
             if (folders.Count() == 0)
             {
                 return;
@@ -90,75 +92,143 @@ namespace MusicFile_Encoder
                 }
             }
         }
+
+
+        //ディレクトリ名　だけを返す
+        private string getdirname_Path(string str)
+        {
+            string s = Path.GetDirectoryName(str);
+            return s;
+        }
+
+        private string getdirname(string str)
+        {
+            string s = Path.GetFileNameWithoutExtension(str);
+            return s;
+        }
+
+
+
+        private string RootInputDir_Path;
         // メイン
         public void Update()
         {
-    
+            
             //　ファイルパス読み込み
-            string name = "C:\\Users\\yw325\\Desktop\\Music";
+            RootInputDir_Path = "C:\\Users\\yw325\\Desktop\\Music";
 
 
             // ファイルパス読み込み
-            List<string> str = new List<string>();
-            Tree_Recursive(name,ref str);           //ディレクトリを再帰的に走査
+            List<string> FileList = new List<string>();         //ファイルフルパスのリスト     
+            Tree_Recursive(RootInputDir_Path, ref FileList);    //ディレクトリを再帰的に走査
 
-            List<Album> Enc_List = new List<Album>();               //エンコード リスト
-            List<List<string>> index = new List<List<string>>();    //アルバムことに分解    
 
-            // ------------------------------------ アルバムごとに分解
-            bool b = false;
-            string t = "";
-            List<string> tmp = new List<string>();
-            foreach (string st in str)
+            //ファイルパス確認用
+            foreach(var v in FileList)
             {
-               string s = System.IO.Path.GetFileName(Path.GetDirectoryName(st));
-                //Console.WriteLine(s);
-                if (t != s)
+            //    Console.WriteLine(v);
+            }
+            
+                
+            List<List<string>> AlbumList = new List<List<string>>();   //ディレクトリ名ごとまとめる
+
+            // --------------------------------------------------------------------------------  ファイルのフルパスを分解 
+            string tt = "";
+            List<string> tmp = new List<string>();
+            bool eee = false;
+            foreach(string str in FileList)
+            {
+               // Console.WriteLine(getdirname(str));
+                string ss = Path.GetDirectoryName(str);
+            //    Console.WriteLine(str);
+
+                if (tt != ss)
                 {
-                    if( b == true) // ループの最初は行わない
+                    tt = ss;
+                    if ( eee == true)
                     {
-                        index.Add(tmp);
+                        AlbumList.Add(new List<string>(tmp));
                         tmp = new List<string>();
                     }
-                    t = s;
-                    tmp.Add(st);
+                    tmp.Add(str);
 
-                }else{
-                    tmp.Add(st);
                 }
-                b = true;
+                else
+                {
+                    tmp.Add(str);
+
+                }
+                
+                eee = true;
             }
-            index.Add(tmp);
+            AlbumList.Add(new List<string>(tmp));
+            // --------------------------------------------------------------------------------
+
+
+            // エンコードをかける
+            foreach(List<string> l in AlbumList)
+            {
+            //    Encode(l);
+            }
+
+ 
+            string www = getdirname_Path(AlbumList[0][0]);
+            string file = getdirname(getdirname_Path(www));
+                
+            Console.WriteLine(file);
+            Directory.CreateDirectory(file);
+            List<string> vs = new List<string>();
+
+            foreach (List<string> t in AlbumList)
+            {
+
+                if (getdirname_Path(getdirname_Path(t[0])) == file)
+                {
+                    vs.Add(getdirname_Path(t[0]));    
+                }
+            }
+
+            foreach(string y in vs)
+            {
+                Console.WriteLine(y);
+            }
+
+
+
+
+
+
+            Console.WriteLine("\n\n-------------- 処理終了 --------------");          
+            Console.ReadKey();
+        }
+
+        // --エンコードをかける関数
+        void Encode(List<string> FileList)
+        {
+            
             // ------------------------------------ 
 
-            // アルバムクラスに設定
-            Album enc = new Album(new List<string>(index[0]));
-
-
-
-
-
-
-            // ------------------------------- エンコードする 
-            string DirName = Path.GetFileName(Path.GetDirectoryName(index[0][0]));  //ディレクトリ名 
-            string DirName_FullPath = Path.GetDirectoryName(index[0][0]);           //ディレクトリ名のフルパス
+            string DirName = Path.GetFileName(Path.GetDirectoryName(FileList[0]));  //ディレクトリ名 
+            string DirName_FullPath = Path.GetDirectoryName(FileList[0]);           //ディレクトリ名のフルパス
             Directory.CreateDirectory(DirName);                                     //ディレクトリを生成
             string Select_Path = DirName_FullPath;  //出力ディレクトリのフルパスを指定して出力ディレクトリを設定
             int num = 0;
-            int thread_count = str.Count;
-            using(CountdownEvent ce　=　new CountdownEvent(thread_count))
+            int thread_count = FileList.Count;
+
+            Console.WriteLine("-------------- "+ DirName +" --------------\n");
+            using (CountdownEvent ce = new CountdownEvent(thread_count))
             {
-                foreach (string fpath in str)
+                foreach (string fpath in FileList)
                 {
-                    string[] pool = { fpath, fpath.Replace(name, Select_Path)}; //ディレクトリ名をdest_path変数に変換
+                    string[] pool = { fpath, fpath.Replace(RootInputDir_Path, Select_Path) }; //ディレクトリ名をdest_path変数に変換
 
                     //スレットプール
                     ThreadPool.QueueUserWorkItem(state => {
                         string[] state_array = (string[])state;
                         Run_Encode(state_array[0], state_array[1]);
-                        
+
                         ce.Signal();//シグナル送信
-                    },pool);  //スレッドプールにする
+                    }, pool);  //スレッドプールにする
                     num++;
                 }
 
@@ -166,16 +236,9 @@ namespace MusicFile_Encoder
                 ce.Wait();
             }
             // ------------------------------- 
-
-            Console.WriteLine("終了");
-
-            
-
-
-
-
-            Console.ReadKey();
+            Console.Write("\n");
         }
+
 
         // エンコード
         private static void Run_Encode(string fname, string out_name)   //out_name ファイル名のフルパス
@@ -184,53 +247,31 @@ namespace MusicFile_Encoder
             Process proc = new Process();           //外部プログラムを起動するためのクラス
             proc.StartInfo.FileName = "ffmpeg.exe"; //.exeを指定
 
-          //  Console.WriteLine(out_name);                                                  
-            string option = " -vn -ac 2 -ar 44100 -ab 320.2k -acodec libmp3lame -f wav ";   //オプション
-            const string dc = "\"";                                                         //ダブルクォート
-            string OutPut_Title = Path.GetFileNameWithoutExtension(out_name);               //ファイル名(拡張子    なし)
-            string TitleName = OutPut_Title +".wav";                                       //ファイル名(拡張子　あり)
-            //Console.WriteLine(OutPut_Title);
-            string DirName = Path.GetDirectoryName(out_name);                               //ディレクトリ名 フルパス
-            Console.WriteLine(DirName);
-            Directory.CreateDirectory(DirName);                                             //ディレクトリを生成
+         
+            string option = " -vn -ac 2 -ar 44100 -ab 320.2k -f wav ";          //オプション
+            const string dc = "\"";                                             //ダブルクォート
+            string OutPut_Title = Path.GetFileNameWithoutExtension(out_name);   //ファイル名(拡張子    なし)
+            string TitleName = OutPut_Title +".wav";                            //ファイル名(拡張子　あり)
+            string DirName = Path.GetFileName(Path.GetDirectoryName(out_name)); //ディレクトリ名                                
+            Directory.CreateDirectory(DirName);                                 //ディレクトリを生成
             
-
-            Console.WriteLine("このディレクトリに出力: "+DirName);
-            Console.WriteLine("ああ　" + OutPut_Title);
-            Console.WriteLine("いい　" + TitleName);
-            Console.WriteLine("うう" + fname);
 
             //エンコードファイル(フルパス), 出力ファイル名 
             proc.StartInfo.Arguments = " -y -i " + dc + fname + dc + option + dc + DirName + "\\" + TitleName + dc;
-
             
-            
-
-
-
-
             proc.StartInfo.UseShellExecute = false;
             proc.StartInfo.CreateNoWindow = true;
             proc.Start();
             proc.WaitForExit();
 
-
-
-
-
-
-
             string file = System.IO.Path.GetFileName(fname);
             if (proc.ExitCode != 0)
             {
                 // ERROR
-                //ConsoleColor Back_Color = ConsoleColor.DarkGreen;   //背景色
-                ConsoleColor Fore_Color = ConsoleColor.Red;        //前景色
-
-                //Console.BackgroundColor = Back_Color;   //背景色を設定
+                ConsoleColor Fore_Color = ConsoleColor.Red; //前景色
                 Console.ForegroundColor = Fore_Color;   //前景色を設定
 
-                Console.Error.Write("[ ERROR ]");
+                Console.Write("[ ERROR ]");
                 Console.ResetColor();   //配色を元に戻す
                 Console.WriteLine("  " + file);
 
@@ -241,12 +282,14 @@ namespace MusicFile_Encoder
                 ConsoleColor Back_Color = ConsoleColor.DarkGreen;   //背景色
                 ConsoleColor Fore_Color = ConsoleColor.Gray;        //前景色
 
+                Console.Write("       ");
+
                 Console.BackgroundColor = Back_Color;   //背景色を設定
                 Console.ForegroundColor = Fore_Color;   //前景色を設定
 
                 Console.Write("[ OK! ]" );
                 Console.ResetColor();   //配色を元に戻す
-                Console.WriteLine(" "+file);
+                Console.WriteLine("      "+file);
 
             }
             
