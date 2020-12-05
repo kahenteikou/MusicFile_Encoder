@@ -95,7 +95,7 @@ namespace MusicFile_Encoder
         {
     
             //　ファイルパス読み込み
-            string name = "C:\\src";
+            string name = "C:\\Users\\yw325\\Desktop\\Music";
 
 
             // ファイルパス読み込み
@@ -132,54 +132,85 @@ namespace MusicFile_Encoder
 
             // アルバムクラスに設定
             Album enc = new Album(new List<string>(index[0]));
-            Console.WriteLine(enc.getList_Count);
-            
-                
 
             string dest_path=@"C:\dest";
-            // 処理するファイル数 (待機用)
-            int threadCount = str.Count;
-            // usingで待機用のEventを初期化
-            using (var countdownEvent = new CountdownEvent(threadCount))
+            string DirName; //出力ディレクトリ名
+            DirName = Path.GetDirectoryName(index[0][0]);
+
+            int num = 0;
+            int thread_count = str.Count;
+            using(CountdownEvent ce=new CountdownEvent(thread_count))
             {
+
                 foreach (string fpath in str)
                 {
-                    string[] arkun = { fpath, fpath.Replace(name, dest_path) };
-                    //ｷｭｰに貯めてる
-                    ThreadPool.QueueUserWorkItem(param =>
-                    {
-                       
-                        string[] param_str = (string[])param;
-                        //エンコ処理
-                        Run_Encode(param_str[0], param_str[1]);
-                        //待機用に終わった合図を出す
-                        countdownEvent.Signal();
-                    }, arkun
-                        );
+                    string[] arkun = { fpath, fpath.Replace(name, dest_path), num.ToString() }; //ディレクトリ名をdest_path変数に変換
+                    ThreadPool.QueueUserWorkItem(statekun => {
+                        string[] state_array = (string[])statekun;
+                        Run_Encode(state_array[0], state_array[1]);
+                        //シグナル送信
+                        ce.Signal();
+                    },arkun);  //スレッドプールにする
+                    num++;
                 }
-                //合図がthreadCountになるまで待機
-                countdownEvent.Wait();
+                //Wait
+                ce.Wait();
             }
-            Console.WriteLine("I did!");
+
+
+
+            
             Console.ReadKey();
         }
-        private static void Run_Encode(string fname,string out_name)
+
+        // エンコード
+        private static void Run_Encode(string fname, string out_name)
         {
-            Process proc = new Process();
-            proc.StartInfo.FileName = "ffmpeg.exe";
-            proc.StartInfo.Arguments = "-i \"" + fname + "\" \"" + out_name + ".mp3\"";
+            
+            Process proc = new Process();           //外部プログラムを起動するためのクラス
+            proc.StartInfo.FileName = "ffmpeg.exe"; //.exeを指定
+
+            string option = " -vn -ac 2 -ar 44100 -ab 320.2k -acodec libmp3lame -f wav ";
+            const string dc = "\""; //ダブルクォート
+            
+            proc.StartInfo.Arguments = " -y -i " + dc + fname  +dc + option + dc + System.IO.Path.GetFileName(fname) + ".wav" + dc;
+
+
+
+
             proc.StartInfo.UseShellExecute = false;
             proc.StartInfo.CreateNoWindow = true;
             proc.Start();
             proc.WaitForExit();
+
+
+            string file = System.IO.Path.GetFileName(fname);
+
+
             if (proc.ExitCode != 0)
             {
-                Console.Error.WriteLine("Err " + fname);
+                // ERROR
+                ConsoleColor Back_Color = ConsoleColor.DarkGreen;   //背景色
+                ConsoleColor Fore_Color = ConsoleColor.Red;        //前景色
+
+                Console.Error.WriteLine("[ ERROR ]");
+                Console.ResetColor();   //配色を元に戻す
+                Console.WriteLine(" " + file);
 
             }
             else
             {
-                Console.WriteLine("Success " + fname);
+                //成功　
+                ConsoleColor Back_Color = ConsoleColor.DarkGreen;   //背景色
+                ConsoleColor Fore_Color = ConsoleColor.Gray;        //前景色
+
+                Console.BackgroundColor = Back_Color;   //背景色を設定
+                Console.ForegroundColor = Fore_Color;   //前景色を設定
+
+                Console.Write("[ OK! ]" );
+                Console.ResetColor();   //配色を元に戻す
+                Console.WriteLine(" "+file);
+
             }
             
 
