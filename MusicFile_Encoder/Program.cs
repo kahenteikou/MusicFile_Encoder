@@ -101,7 +101,7 @@ namespace MusicFile_Encoder
         {
     
             //　ファイルパス読み込み
-            string name = "C:\\src";
+            string name = "C:\\Users\\yw325\\Desktop\\Music";
 
 
             // ファイルパス読み込み
@@ -138,40 +138,80 @@ namespace MusicFile_Encoder
 
             // アルバムクラスに設定
             Album enc = new Album(new List<string>(index[0]));
-            Console.WriteLine(enc.getList_Count);
-            
-                
 
             string dest_path=@"C:\dest";
+            string DirName; //出力ディレクトリ名
+            DirName = Path.GetDirectoryName(index[0][0]);
 
-            foreach(string fpath in str)
-            {
-                string[] arkun = { fpath, fpath.Replace(name, dest_path) };
-
-                ThreadPool.QueueUserWorkItem(new WaitCallback(Run_Encode), arkun);
+            int num = 0;
+            foreach (string fpath in str)
+            { 
+                string[] arkun = { fpath, fpath.Replace(name, dest_path),num.ToString() }; //ディレクトリ名をdest_path変数に変換
+                ThreadPool.QueueUserWorkItem(new WaitCallback(Run_Encode), arkun);  //スレッドプールにする
+                num++;
             }
+
+
+
+            
             Console.ReadKey();
         }
+
+
+        
+        // エンコード
         private static void Run_Encode(object state)
         {
             object[] array = state as object[];
+            string num = (String)array[2];
+
             string fname = (String)(array[0]);
             string out_name = (String)(array[1]);
-            Process proc = new Process();
-            proc.StartInfo.FileName = "ffmpeg.exe";
-            proc.StartInfo.Arguments = "-i \"" + fname + "\" \"" + out_name + ".mp3\"";
+            
+            Process proc = new Process();           //外部プログラムを起動するためのクラス
+            proc.StartInfo.FileName = "ffmpeg.exe"; //.exeを指定
+
+            string option = " -vn -ac 2 -ar 44100 -ab 320.2k -acodec libmp3lame -f wav ";
+            const string dc = "\""; //ダブルクォート
+            
+            proc.StartInfo.Arguments = " -y -i " + dc + fname  +dc + option + dc + System.IO.Path.GetFileName(fname) + ".wav" + dc;
+
+
+
+
             proc.StartInfo.UseShellExecute = false;
             proc.StartInfo.CreateNoWindow = true;
             proc.Start();
             proc.WaitForExit();
+
+
+            string file = System.IO.Path.GetFileName(fname);
+
+
             if (proc.ExitCode != 0)
             {
-                Console.Error.WriteLine("Err " + fname);
+                // ERROR
+                ConsoleColor Back_Color = ConsoleColor.DarkGreen;   //背景色
+                ConsoleColor Fore_Color = ConsoleColor.Red;        //前景色
+
+                Console.Error.WriteLine("[ ERROR ]");
+                Console.ResetColor();   //配色を元に戻す
+                Console.WriteLine(" " + file);
 
             }
             else
             {
-                Console.WriteLine("Success " + fname);
+                //成功　
+                ConsoleColor Back_Color = ConsoleColor.DarkGreen;   //背景色
+                ConsoleColor Fore_Color = ConsoleColor.Gray;        //前景色
+
+                Console.BackgroundColor = Back_Color;   //背景色を設定
+                Console.ForegroundColor = Fore_Color;   //前景色を設定
+
+                Console.Write("[ OK! ]" );
+                Console.ResetColor();   //配色を元に戻す
+                Console.WriteLine(" "+file);
+
             }
         }
 
