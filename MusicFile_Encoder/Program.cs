@@ -168,7 +168,7 @@ namespace MusicFile_Encoder
             // エンコードをかける
             foreach(List<string> l in AlbumList)
             {
-                //Encode(l);
+                Encode(l);
             }
 
  
@@ -187,18 +187,17 @@ namespace MusicFile_Encoder
                 
                 if (getdirname_Path(getdirname_Path(t[0])) == r)
                 {
-                    Console.WriteLine("ああ");
                     vs.Add(getdirname_Path(t[0]));    
                 }
             }
 
 
             //確認ログ
-            Console.WriteLine("えええ");
+            
             foreach(string y in vs)
             {
-                Console.WriteLine("あああ " + y);
-                Directory.Move(y,r);
+            
+            
             }
 
 
@@ -211,11 +210,11 @@ namespace MusicFile_Encoder
         }
 
         // --エンコードをかける関数
-        void Encode(List<string> FileList)
+        void Encode(List<string> FileList)  //引数はフルパス
         {
             
             // ------------------------------------ 
-
+            
             string DirName = Path.GetFileName(Path.GetDirectoryName(FileList[0]));  //ディレクトリ名 
             string DirName_FullPath = Path.GetDirectoryName(FileList[0]);           //ディレクトリ名のフルパス
             Directory.CreateDirectory(DirName);                                     //ディレクトリを生成
