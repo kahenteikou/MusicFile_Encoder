@@ -65,12 +65,10 @@ namespace MusicFile_Encoder
             }
 
         }
-
         public Encorder()
         {
             //System.Console.WriteLine("コンストラクタ\n");
         }
-
 
         // ディレクトリを再帰的に走査
         public static void Tree_Recursive(string folderPath, ref List<string> list)
@@ -92,10 +90,6 @@ namespace MusicFile_Encoder
                 }
             }
         }
-
-
-
-
         // メイン
         public void Update()
         {
@@ -143,20 +137,34 @@ namespace MusicFile_Encoder
                 
 
             string dest_path=@"C:\dest";
-
-            foreach(string fpath in str)
+            // 処理するファイル数 (待機用)
+            int threadCount = str.Count;
+            // usingで待機用のEventを初期化
+            using (var countdownEvent = new CountdownEvent(threadCount))
             {
-                string[] arkun = { fpath, fpath.Replace(name, dest_path) };
-
-                ThreadPool.QueueUserWorkItem(new WaitCallback(Run_Encode), arkun);
+                foreach (string fpath in str)
+                {
+                    string[] arkun = { fpath, fpath.Replace(name, dest_path) };
+                    //ｷｭｰに貯めてる
+                    ThreadPool.QueueUserWorkItem(param =>
+                    {
+                       
+                        string[] param_str = (string[])param;
+                        //エンコ処理
+                        Run_Encode(param_str[0], param_str[1]);
+                        //待機用に終わった合図を出す
+                        countdownEvent.Signal();
+                    }, arkun
+                        );
+                }
+                //合図がthreadCountになるまで待機
+                countdownEvent.Wait();
             }
+            Console.WriteLine("I did!");
             Console.ReadKey();
         }
-        private static void Run_Encode(object state)
+        private static void Run_Encode(string fname,string out_name)
         {
-            object[] array = state as object[];
-            string fname = (String)(array[0]);
-            string out_name = (String)(array[1]);
             Process proc = new Process();
             proc.StartInfo.FileName = "ffmpeg.exe";
             proc.StartInfo.Arguments = "-i \"" + fname + "\" \"" + out_name + ".mp3\"";
@@ -173,6 +181,8 @@ namespace MusicFile_Encoder
             {
                 Console.WriteLine("Success " + fname);
             }
+            
+
         }
 
     }
