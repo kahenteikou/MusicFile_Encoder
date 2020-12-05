@@ -168,34 +168,42 @@ namespace MusicFile_Encoder
             // エンコードをかける
             foreach(List<string> l in AlbumList)
             {
-            //    Encode(l);
+                //Encode(l);
             }
 
  
+            // ディレクトリに移動
             string www = getdirname_Path(AlbumList[0][0]);
-            string file = getdirname(getdirname_Path(www));
-                
-            Console.WriteLine(file);
-            Directory.CreateDirectory(file);
-            List<string> vs = new List<string>();
+            string r = getdirname_Path(www);
+            string file = getdirname(getdirname_Path(www)); 
 
+            Console.WriteLine(r);
+
+           // Directory.CreateDirectory(file);
+            List<string> vs = new List<string>();
             foreach (List<string> t in AlbumList)
             {
-
-                if (getdirname_Path(getdirname_Path(t[0])) == file)
+               // Console.WriteLine(getdirname_Path(getdirname_Path(t[0])));
+                
+                if (getdirname_Path(getdirname_Path(t[0])) == r)
                 {
+                    Console.WriteLine("ああ");
                     vs.Add(getdirname_Path(t[0]));    
                 }
             }
 
+
+            //確認ログ
+            Console.WriteLine("えええ");
             foreach(string y in vs)
             {
-                Console.WriteLine(y);
+                Console.WriteLine("あああ " + y);
+                Directory.Move(y,r);
             }
 
 
 
-
+            
 
 
             Console.WriteLine("\n\n-------------- 処理終了 --------------");          
