@@ -65,12 +65,10 @@ namespace MusicFile_Encoder
             }
 
         }
-
         public Encorder()
         {
             //System.Console.WriteLine("コンストラクタ\n");
         }
-
 
         // ディレクトリを再帰的に走査
         public static void Tree_Recursive(string folderPath, ref List<string> list)
@@ -92,10 +90,6 @@ namespace MusicFile_Encoder
                 }
             }
         }
-
-
-
-
         // メイン
         public void Update()
         {
@@ -144,11 +138,23 @@ namespace MusicFile_Encoder
             DirName = Path.GetDirectoryName(index[0][0]);
 
             int num = 0;
-            foreach (string fpath in str)
-            { 
-                string[] arkun = { fpath, fpath.Replace(name, dest_path),num.ToString() }; //ディレクトリ名をdest_path変数に変換
-                ThreadPool.QueueUserWorkItem(new WaitCallback(Run_Encode), arkun);  //スレッドプールにする
-                num++;
+            int thread_count = str.Count;
+            using(CountdownEvent ce=new CountdownEvent(thread_count))
+            {
+
+                foreach (string fpath in str)
+                {
+                    string[] arkun = { fpath, fpath.Replace(name, dest_path), num.ToString() }; //ディレクトリ名をdest_path変数に変換
+                    ThreadPool.QueueUserWorkItem(statekun => {
+                        string[] state_array = (string[])statekun;
+                        Run_Encode(state_array[0], state_array[1]);
+                        //シグナル送信
+                        ce.Signal();
+                    },arkun);  //スレッドプールにする
+                    num++;
+                }
+                //Wait
+                ce.Wait();
             }
 
 
@@ -157,16 +163,9 @@ namespace MusicFile_Encoder
             Console.ReadKey();
         }
 
-
-        
         // エンコード
-        private static void Run_Encode(object state)
+        private static void Run_Encode(string fname, string out_name)
         {
-            object[] array = state as object[];
-            string num = (String)array[2];
-
-            string fname = (String)(array[0]);
-            string out_name = (String)(array[1]);
             
             Process proc = new Process();           //外部プログラムを起動するためのクラス
             proc.StartInfo.FileName = "ffmpeg.exe"; //.exeを指定
@@ -213,6 +212,8 @@ namespace MusicFile_Encoder
                 Console.WriteLine(" "+file);
 
             }
+            
+
         }
 
     }
